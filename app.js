@@ -80,8 +80,7 @@ app.put("/todos/:id", function(req, res){
         res.json(todo);
    }
   });
-});
-
+}); // {new: true} will fetch the updated item instead of the old one once updated
 
 app.delete("/todos/:id", function(req, res){
   Todo.findByIdAndRemove(req.params.id, function(err, todo){

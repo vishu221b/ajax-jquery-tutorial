@@ -72,3 +72,30 @@ $('#new-todo-form').submit((e) => {
    }); 
 });
 
+$('#todo-list').on('click', '.edit-todo-button', (e)=>{
+    $(e.target).parent().siblings('.edit-todo-form').toggle();
+});
+
+$('#todo-list').on('submit', '.edit-todo-form', (e)=>{
+    e.preventDefault();
+    let formData = $(e.target).serialize();
+    console.log(formData);
+    let formAction = $(e.target).attr('action');
+    $.ajax({
+        url: formAction,
+        data: formData,
+        type: 'PUT',
+        success: function(response){
+            console.log(response);
+        }
+    });
+    $.get(formAction, function(response){
+            console.log(response);
+            $(e.target).toggle();
+            $(e.target).siblings('.lead').val(response.text);
+    });
+});
+
+
+
+

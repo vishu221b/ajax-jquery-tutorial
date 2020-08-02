@@ -55,11 +55,18 @@ $('#new-todo-form').submit((e) => {
        $('#todo-list').append(
            `
            <li class="list-group-item">
+                    <form action="/todos/${response._id}" class="edit-todo-form">
+						<div class="form-group">
+							<label>Item Text</label>
+							<input type="text" value="${response.text}" name="todo[text]" class="form-control">
+						</div>
+						<button type="submit" class="btn btn-primary">Update Item</button>
+					</form>
 					<span class="lead">
 						${response.text}
 					</span>
 					<div class="pull-right">
-						<a href="/todos/${response.text._id}/edit" class="btn btn-sm btn-warning">Edit</a>
+                    <button class="btn btn-sm btn-warning edit-todo-button">Edit</button>
 						<form style="display: inline" method="POST" action="/todos/${response._id}">
 							<button type="submit" class="btn btn-sm btn-danger">Delete</button>
 						</form>
@@ -75,27 +82,47 @@ $('#new-todo-form').submit((e) => {
 $('#todo-list').on('click', '.edit-todo-button', (e)=>{
     $(e.target).parent().siblings('.edit-todo-form').toggle();
 });
-
-$('#todo-list').on('submit', '.edit-todo-form', (e)=>{
-    e.preventDefault();
-    let formData = $(e.target).serialize();
-    console.log(formData);
-    let formAction = $(e.target).attr('action');
-    $.ajax({
-        url: formAction,
-        data: formData,
-        type: 'PUT',
-        success: function(response){
-            console.log(response);
-        }
-    });
-    $.get(formAction, function(response){
-            console.log(response);
-            $(e.target).toggle();
-            $(e.target).siblings('.lead').val(response.text);
+$(document).ready(() => {
+    $('#todo-list').on('submit', '.edit-todo-form', (e)=>{
+        e.preventDefault();
+        let formData = $(e.target).serialize();
+        let formAction = $(e.target).attr('action');
+        let $wholeItem = $(e.target).parent('.list-group-item');
+        console.log($wholeItem);
+        $.ajax({
+            url: formAction,
+            data: formData,
+            type: 'PUT',
+            wholeItem: $wholeItem, // passing since ajax has it's own scope
+            success: function(response){
+                console.log(response);
+                console.log(this);
+                console.log(this.wholeItem);
+                this.wholeItem.html(
+                    `
+                    <form action="/todos/${response._id}" class="edit-todo-form">
+                            <div class="form-group">
+                                <label>Item Text</label>
+                                <input type="text" value="${ response.text }" name="todo[text]" class="form-control">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Item</button>
+                        </form>
+                        <span class="lead">
+                            ${ response.text }
+                        </span>
+                        <div class="pull-right">
+                            <button class="btn btn-sm btn-warning edit-todo-button">Edit</button>
+                            <form style="display: inline" method="POST" action="/todos/${response._id}" id="<%= todo._id %>">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </div>
+                        <div class="clearfix"></div>
+                    `
+                );
+            }
+        });
     });
 });
-
 
 
 

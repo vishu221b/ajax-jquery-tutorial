@@ -67,7 +67,7 @@ $('#new-todo-form').submit((e) => {
 					</span>
 					<div class="pull-right">
                     <button class="btn btn-sm btn-warning edit-todo-button">Edit</button>
-						<form style="display: inline" method="POST" action="/todos/${response._id}">
+						<form style="display: inline" method="POST" action="/todos/${response._id}" class="delete-item-form">
 							<button type="submit" class="btn btn-sm btn-danger">Delete</button>
 						</form>
 					</div>
@@ -112,7 +112,7 @@ $(document).ready(() => {
                         </span>
                         <div class="pull-right">
                             <button class="btn btn-sm btn-warning edit-todo-button">Edit</button>
-                            <form style="display: inline" method="POST" action="/todos/${response._id}" id="<%= todo._id %>">
+                            <form style="display: inline" method="POST" action="/todos/${response._id}" class="delete-item-form">
                                 <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                             </form>
                         </div>
@@ -121,6 +121,26 @@ $(document).ready(() => {
                 );
             }
         });
+    });
+    $('#todo-list').on('submit', '.delete-item-form', (e)=>{
+        e.preventDefault();
+        let formAction = $(e.target).attr('action');
+        let confirmResponse = confirm('Are you sure?');
+        if(confirmResponse){
+            let $currentItem = $(e.target).closest('.list-group-item');
+            console.log(e.target);
+            console.log($currentItem);
+            $.ajax({
+                url: formAction,
+                type: 'DELETE',
+                currentItem: $currentItem,
+                success: function(response){
+                    console.log(this);
+                    this.currentItem.remove();
+                }
+            });
+        }
+        $(e.target).find('button').blur();
     });
 });
 
